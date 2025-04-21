@@ -9,7 +9,7 @@ We will leverage a hybrid vector search pipeline w/ the following configuration:
 
 - Dense embeddings using `BAAI/bge-small-en-v1.5`
   - Binary Quantization
-- Sparse embeddings using `prithivida/Splade_PP_en_v1`
+- Sparse embeddings using `Qdrant/bm25`
 - ColBERT embeddings using `answerdotai/answerai-colbert-small-v1`
   - Config specifies to not create the HNSW index
   - Used only for reranking
