@@ -31,6 +31,14 @@ All embeddings will be generated using `fastembed` and `sentence-transformers`. 
     * The ColBERT model inference via `fastembed` remains the main contributor to the ingestion time in the provided example (`wiki_cohere.py`). Investigation into alternative ColBERT libraries (`pylate`, `ragatouille`, `colbert-ai`) revealed dependency or maintenance issues.
 * **Focus:** The priority for this assignment was placed on demonstrating the correct architectural implementation and usage of Qdrant's features as specified, using readily available and functional library components. Further performance optimization for specific hardware (like MPS) would be a subsequent step in a production scenario.
 
+## Potential Improvements
+* **Async HybridPipeline:**
+  * This would help with large insertions like the 1 million example included here.
+* **Client Side Retry Logic:**
+  * The current implementation doesn't retry if insertions fail.
+* **Error Handling:**
+  * Not much is done to handle errors from insertions, reads, etc, this is left the to Qdrant Client. Future versions would implement more comprehensive logic.
+
 ### Execution
 
 `chmod +x run_pipeline.sh`
