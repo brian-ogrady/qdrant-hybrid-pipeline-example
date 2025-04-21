@@ -20,6 +20,17 @@ We will leverage a hybrid vector search pipeline w/ the following configuration:
 
 All embeddings will be generated using `fastembed` and `sentence-transformers`. We will also be leveraging the Python package I created, `qdrant-hybrid-pipeline`, which is imported via `hybrid_search` (I need to change that name).
 
+
+## Implementation Notes & Performance Considerations
+
+* **Functionality:**
+  * The pipeline successfully implements the required hybrid search (dense, sparse, late-interaction), leverages Qdrant's query API, handles multi-tenancy via partitioning, uses Binary Quantization for dense vectors, and is demonstrated with a 1M record dataset setup via Docker Compose with the specified cluster configuration (2 nodes, 3 shards, replication=2).
+* **Performance:** During testing on Apple Silicon (MPS), a performance bottleneck was observed during the ingestion phase, primarily related to the late-interaction embeddings (ColBERT via `fastembed`). 
+    * Initial tests with `fastembed` for dense embeddings also showed slower performance on MPS compared to `sentence-transformers`, so the latter was used for the dense model in the final example (`wiki_cohere.py`).
+    * The `Qdrant/bm25` sparse model was chosen for its speed, adding minimal latency compared to alternatives like SPLADE which proved significantly slower.
+    * The ColBERT model inference via `fastembed` remains the main contributor to the ingestion time in the provided example (`wiki_cohere.py`). Investigation into alternative ColBERT libraries (`pylate`, `ragatouille`, `colbert-ai`) revealed dependency or maintenance issues.
+* **Focus:** The priority for this assignment was placed on demonstrating the correct architectural implementation and usage of Qdrant's features as specified, using readily available and functional library components. Further performance optimization for specific hardware (like MPS) would be a subsequent step in a production scenario.
+
 ### Execution
 
 `chmod +x run_pipeline.sh`
