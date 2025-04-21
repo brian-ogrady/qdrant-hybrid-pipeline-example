@@ -244,7 +244,7 @@ def main():
         --batch-size: Number of records per insertion batch (default: 2000)
     """
     parser = argparse.ArgumentParser(description="Insert Wikipedia dataset into Qdrant")
-    parser.add_argument("--num-records", type=int, default=10000, help="Number of records to insert")
+    parser.add_argument("--num-records", type=int, default=1000000, help="Number of records to insert")
     parser.add_argument("--num-tenants", type=int, default=10, help="Number of tenants to insert")
     parser.add_argument("--batch-size", type=int, default=2000, help="Batch size for inserting documents")
     args = parser.parse_args()
