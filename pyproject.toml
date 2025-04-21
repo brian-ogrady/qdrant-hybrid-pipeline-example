@@ -1,0 +1,14 @@
+[project]
+name = "test-qdrant-hybrid"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "datasets>=3.5.0",
+    "fastembed>=0.6.1",
+    "qdrant-client>=1.13.3",
+    "qdrant-hybrid-pipeline>=0.1.1",
+    "sentence-transformers>=4.1.0",
+    "tqdm>=4.67.1",
+]
