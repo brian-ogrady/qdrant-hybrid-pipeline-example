@@ -65,12 +65,12 @@ def _configure_pipeline() -> HybridPipelineConfig:
     Returns:
         HybridPipelineConfig: Complete configuration for hybrid search pipeline
     """
-    text_model = SentenceTransformerEmbedding("BAAI/bge-small-en-v1.5", device="mps")
+    text_model = SentenceTransformerEmbedding("intfloat/multilingual-e5-large", device="mps")
     sparse_model = SparseTextEmbedding("Qdrant/bm25")
     late_model = LateInteractionTextEmbedding("answerdotai/answerai-colbert-small-v1")
             
     dense_params = VectorParams(
-        size=384,
+        size=1024,
         distance=Distance.COSINE,
         on_disk=True,
         quantization_config=BinaryQuantization(
@@ -104,9 +104,7 @@ def _configure_pipeline() -> HybridPipelineConfig:
     return HybridPipelineConfig(
         text_embedding_config=(text_model, dense_params),
         sparse_embedding_config=(sparse_model, sparse_params),
-        late_interaction_text_embedding_config=(late_model, late_params),
-        partition_config=(partition_field, partition_index),
-        multi_tenant=True,
+        multi_tenant=False,
         replication_factor=2,
         shard_number=3,
     )
@@ -129,7 +127,6 @@ def _query(pipeline: HybridPipeline, query: str, num_results: int = 10):
     results_a = pipeline.search(
             query=query, 
             top_k=num_results,
-            partition_filter="tenant_id_0"
         )
     return results_a
 

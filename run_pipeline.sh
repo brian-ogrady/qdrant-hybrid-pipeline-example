@@ -8,7 +8,7 @@ source .venv/bin/activate
 docker-compose up -d
 sleep 30
 
-python wiki_cohere.py --num-records 1000 --num-tenants 10 --batch-size 64
+python search_ads.py --config configs/baseline_experiment.yml --csv-path generated_keywords.csv --text-column keyword --batch-size 64
 
 docker-compose down -v
 
