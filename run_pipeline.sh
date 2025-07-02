@@ -8,7 +8,13 @@ source .venv/bin/activate
 docker-compose up -d
 sleep 30
 
-python search_ads.py --config configs/baseline_experiment.yml --csv-path generated_keywords.csv --text-column keyword --batch-size 64
+python scripts/search_ads.py \
+    --config configs/baseline_experiment.yml \
+    --csv-path data/generated_keywords.csv \
+    --text-column keyword \
+    --queries-path data/queries.json \
+    --batch-size 64 \
+    --top-k 10
 
 docker-compose down -v
 

@@ -7,6 +7,7 @@ and ingest data from a specified CSV file.
 
 import argparse
 import math
+import json
 import os
 import time
 import uuid
@@ -120,16 +121,22 @@ def main():
         help="The name of the column in the CSV that contains the text to be indexed."
     )
     parser.add_argument(
+        "--queries-path", 
+        type=str, 
+        required=True, 
+        help="Path to the JSON file containing the search queries."
+    )
+    parser.add_argument(
         "--batch-size", 
         type=int, 
         default=128, 
         help="Batch size for inserting documents."
     )
     parser.add_argument(
-        "--query", 
-        type=str, 
-        default="What is the capital of France?", 
-        help="A sample query to run after ingestion."
+        "--top-k", 
+        type=int, 
+        default=10, 
+        help="Number of search results to return for each query."
     )
     args = parser.parse_args()
 
@@ -153,19 +160,25 @@ def main():
         args.batch_size
     )
 
-    print(f"\nRunning sample query: '{args.query}'")
-    results = pipeline.search(query=args.query, top_k=5)
+    try:
+        with open(args.queries_path, 'r') as f:
+            queries_data = json.load(f)
+        queries = queries_data.get("queries", [])
+        print(f"\nLoaded {len(queries)} queries from {args.queries_path}")
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading queries file: {e}")
+        return
+
+    all_results = {}
+    for query in tqdm(queries, desc="Running search queries"):
+        results = pipeline.search(query=query, top_k=args.top_k)
+        all_results[query] = [result.model_dump() for result in results]
+
+    output_filename = "search_results.json"
+    with open(output_filename, 'w') as f:
+        json.dump(all_results, f, indent=4)
     
-    print("\n--- Search Results ---")
-    if not results:
-        print("No results found.")
-    for i, result in enumerate(results):
-        print(f"\nResult {i+1} (Score: {result.score:.4f})")
-        # Print the original text from the payload
-        print(f"  Text: {result.payload.get(args.text_column, 'N/A')}")
-        # Print other relevant payload data
-        other_payload = {k: v for k, v in result.payload.items() if k != args.text_column and k != "document_id"}
-        print(f"  Metadata: {other_payload}")
+    print(f"\nSuccessfully ran all queries. Results saved to {output_filename}")
 
 
 if __name__ == "__main__":
