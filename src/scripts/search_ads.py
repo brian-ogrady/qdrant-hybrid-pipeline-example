@@ -127,6 +127,18 @@ def main():
         help="Path to the JSON file containing the search queries."
     )
     parser.add_argument(
+        "--results-path",
+        type=str,
+        required=True,
+        help="Path to save the search results JSON file."
+    )
+    parser.add_argument(
+        "--collection-name",
+        type=str,
+        required=True,
+        help="Unique name for the Qdrant collection for this experiment."
+    )
+    parser.add_argument(
         "--batch-size", 
         type=int, 
         default=128, 
@@ -149,7 +161,7 @@ def main():
     # 2. Initialize the pipeline with the created config object
     pipeline = HybridPipeline(
         qdrant_client=qdrant,
-        collection_name="data_from_csv",
+        collection_name=args.collection_name,
         hybrid_pipeline_config=pipeline_config,
     )
 
@@ -174,7 +186,8 @@ def main():
         results = pipeline.search(query=query, top_k=args.top_k)
         all_results[query] = [result.model_dump() for result in results]
 
-    output_filename = "search_results.json"
+    output_filename = args.results_path
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
     with open(output_filename, 'w') as f:
         json.dump(all_results, f, indent=4)
     
